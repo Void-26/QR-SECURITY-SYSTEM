@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>QR Code Security System</title>
+
+<style>
+
+:root {
+
+  --bg: #050806;
+
+  --panel: #0d1711;
+
+  --inner: #09120d;
+
+  --green: #80ce6d;
+
+  --blue: #7593e7;
+
+  --text: #edf4ee;
+
+  --muted: #a5b7aa;
+
+  --border: #294c34;
+
+}
+
+* { box-sizing: border-box; }
+
+body {
+
+  margin: 0;
+
+  background: var(--bg);
+
+  color: var(--text);
+
+  font-family: Arial, sans-serif;
+
+  min-height: 100vh;
+
+}
+
+body::before {
+
+  content: "";
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: -1;
+
+  pointer-events: none;
+
+  background:
+
+    radial-gradient(circle at top, #17412655, transparent 60%),
+
+    linear-gradient(90deg, transparent 98%, #244e2b30 100%),
+
+    linear-gradient(transparent 98%, #244e2b30 100%);
+
+  background-size: auto, 70px 70px, 70px 70px;
+
+}
+
+.container {
+
+  max-width: 1100px;
+
+  margin: auto;
+
+  padding: 25px 18px 60px;
+
+}
+
+.hero {
+
+  text-align: center;
+
+  padding: 45px 10px;
+
+}
+
+.eyebrow {
+
+  color: var(--blue);
+
+  font-size: 12px;
+
+  font-weight: bold;
+
+  letter-spacing: 2px;
+
+}
+
+h1 {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin: 28px 0;
+
+  font-family: Georgia, serif;
+
+  font-size: clamp(36px, 7vw, 76px);
+
+}
+
+.blue { color: var(--blue); }
+
+.green { color: var(--green); }
+
+.subtitle {
+
+  color: var(--muted);
+
+}
+
+.status {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+  padding: 12px 18px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 30px;
+
+  color: var(--green);
+
+  font-size: 12px;
+
+  font-weight: bold;
+
+}
+
+.dot {
+
+  width: 9px;
+
+  height: 9px;
+
+  background: var(--green);
+
+  border-radius: 50%;
+
+  box-shadow: 0 0 12px var(--green);
+
+}
+
+.panel {
+
+  margin-top: 24px;
+
+  padding: 28px;
+
+  background: var(--panel);
+
+  border: 1px solid var(--border);
+
+  border-radius: 16px;
+
+}
+
+.heading {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+}
+
+.number {
+
+  color: var(--blue);
+
+  font-weight: bold;
+
+}
+
+h2 {
+
+  color: var(--green);
+
+  font-size: 23px;
+
+}
+
+.description, .note {
+
+  color: var(--muted);
+
+  line-height: 1.7;
+
+}
+
+.note { font-size: 13px; }
+
+.info-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+
+  gap: 14px;
+
+  margin-top: 24px;
+
+}
+
+.info-box {
+
+  min-width: 0;
+
+  padding: 19px;
+
+  background: var(--inner);
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+}
+
+.info-box:hover {
+
+  border-color: var(--green);
+
+}
+
+.label {
+
+  display: block;
+
+  color: var(--blue);
+
+  font-size: 11px;
+
+  font-weight: bold;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+
+  margin-bottom: 12px;
+
+}
+
+.value {
+
+  display: block;
+
+  color: var(--green);
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+  overflow-wrap: anywhere;
+
+}
+
+.map-frame {
+
+  display: block;
+
+  width: 100%;
+
+  height: 350px;
+
+  margin-top: 20px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+}
+
+.map-placeholder {
+
+  padding: 70px 15px;
+
+  text-align: center;
+
+  color: var(--muted);
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+}
+
+footer {
+
+  margin-top: 45px;
+
+  color: var(--green);
+
+  text-align: center;
+
+  font-size: 12px;
+
+}
+
+footer span {
+
+  display: block;
+
+  margin-top: 10px;
+
+  color: var(--muted);
+
+}
+
+.overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  background: #000e;
+
+  backdrop-filter: blur(8px);
+
+}
+
+.overlay.hidden { display: none; }
+
+.consent-card {
+
+  width: 100%;
+
+  max-width: 500px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 34px 28px;
+
+  background: #0c1710;
+
+  border: 1px solid var(--green);
+
+  border-radius: 18px;
+
+  text-align: center;
+
+}
+
+.consent-card p {
+
+  color: var(--muted);
+
+  line-height: 1.7;
+
+  font-size: 14px;
+
+}
+
+.consent-card .eyebrow {
+
+  color: var(--blue);
+
+}
+
+button {
+
+  margin-top: 18px;
+
+  padding: 16px 28px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: var(--green);
+
+  color: #071009;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+}
+
+button:hover { background: #a0ee8b; }
+
+@media(max-width:600px) {
+
+  .container { padding: 15px 12px 45px; }
+
+  .panel { padding: 19px; }
+
+  .info-grid {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+  }
+
+  .info-box { padding: 13px; }
+
+  .label { font-size: 10px; }
+
+  .value { font-size: 13px; }
+
+  .map-frame { height: 280px; }
+
+}
+
+@media(max-width:350px) {
+
+  .info-grid { grid-template-columns: 1fr; }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay" id="overlay">
+
+  <div class="consent-card" role="dialog"
+
+       aria-modal="true" aria-labelledby="consentTitle">
+
+    <div style="font-size:50px;color:#80ce6d">⬡</div>
+
+    <p class="eyebrow">CYBERSECURITY AWARENESS</p>
+
+    <h2 id="consentTitle">Privacy & Device Analysis</h2>
+
+    <p>
+
+      This educational website will read available
+
+      device and browser information, use external
+
+      services to check your public IP and approximate
+
+      location, and request precise GPS permission.
+
+    </p>
+
+    <p>
+
+      The IP services receive network requests.
+
+      Google Maps receives approximate coordinates.
+
+      Precise GPS is displayed only on this page,
+
+      not submitted to a database.
+
+    </p>
+
+    <button id="accept">ACCEPT & CONTINUE</button>
+
+    <p style="font-size:12px">
+
+      GPS permission is controlled separately by your
+
+      browser. You can leave without accepting.
+
+    </p>
+
+  </div>
+
+</div>
+
+<main class="container">
+
+<header class="hero">
+
+  <p class="eyebrow">CYBERSECURITY PROJECT</p>
+
+  <h1>
+
+    <span class="blue">QR CODE</span>
+
+    <span class="green">SECURITY SYSTEM</span>
+
+  </h1>
+
+  <p class="subtitle">
+
+    Privacy & Security Awareness Dashboard
+
+  </p>
+
+  <div class="status">
+
+    <span class="dot"></span>
+
+    <span id="status">WAITING FOR CONSENT</span>
+
+  </div>
+
+</header>
+
+<section class="panel">
+
+  <div class="heading">
+
+    <span class="number">01</span>
+
+    <h2>Device Intelligence</h2>
+
+  </div>
+
+  <p class="description">
+
+    Browser-reported device information and
+
+    estimated hardware properties.
+
+  </p>
+
+  <div class="info-grid" id="infoGrid"></div>
+
+</section>
+
+<section class="panel">
+
+  <div class="heading">
+
+    <span class="number">02</span>
+
+    <h2>Approximate IP Location</h2>
+
+  </div>
+
+  <p class="description" id="locationText">
+
+    Waiting for consent...
+
+  </p>
+
+  <div id="mapContainer">
+
+    <div class="map-placeholder">
+
+      Map will appear after analysis.
+
+    </div>
+
+  </div>
+
+  <p class="note">
+
+    This map uses approximate IP-based location,
+
+    not precise GPS. Results may be inaccurate.
+
+  </p>
+
+</section>
+
+<section class="panel">
+
+  <div class="heading">
+
+    <span class="number">03</span>
+
+    <h2>Security Awareness</h2>
+
+  </div>
+
+  <p class="description">
+
+    A QR code opens a website. Websites may read
+
+    browser information and request additional
+
+    permissions.
+
+  </p>
+
+  <p class="description">
+
+    Verify unfamiliar links and understand permission
+
+    requests before sharing personal information.
+
+  </p>
+
+</section>
+
+<footer>
+
+  <strong>QR CODE SECURITY SYSTEM</strong>
+
+  <span>Educational Cybersecurity Demonstration</span>
+
+</footer>
+
+</main>
+
+<script>
+
+"use strict";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const getEl = id => document.getElementById(id);
+
+  const ua = navigator.userAgent || "";
+
+  const fields = [
+
+    ["os", "Operating System"],
+
+    ["browser", "Browser"],
+
+    ["deviceType", "Device Type"],
+
+    ["manufacturer", "Manufacturer"],
+
+    ["ip", "Public IP"],
+
+    ["timezone", "Time Zone"],
+
+    ["localTime", "Local Time"],
+
+    ["battery", "Battery"],
+
+    ["screen", "Screen Resolution"],
+
+    ["language", "Language"],
+
+    ["cpu", "CPU Threads"],
+
+    ["memory", "Approximate RAM"],
+
+    ["network", "Network Type"],
+
+    ["downlink", "Estimated Downlink"],
+
+    ["touch", "Touch Support"],
+
+    ["colorScheme", "Color Scheme"],
+
+    ["gpu", "GPU Renderer"],
+
+    ["online", "Online Status"],
+
+    ["gps", "Precise GPS Location"]
+
+  ];
+
+  for (const [id, label] of fields) {
+
+    const box = document.createElement("div");
+
+    box.className = "info-box";
+
+    const title = document.createElement("span");
+
+    title.className = "label";
+
+    title.textContent = label;
+
+    const value = document.createElement("span");
+
+    value.className = "value";
+
+    value.id = id;
+
+    value.textContent = "Waiting...";
+
+    box.append(title, value);
+
+    getEl("infoGrid").append(box);
+
+  }
+
+  function show(id, value) {
+
+    const element = getEl(id);
+
+    if (element) element.textContent = String(value);
+
+  }
+
+  function tryReading(name, fn) {
+    try {
+      fn();
+    } catch (error) {
+      console.warn(`${name} unavailable`, error);
+    }
+  }
+
+  function detectOS() {
+
+    if (/Android/i.test(ua)) return "Android";
+
+    if (/iPhone|iPad|iPod/i.test(ua)) return "iOS / iPadOS";
+
+    if (/Macintosh/i.test(ua) &&
+
+        navigator.maxTouchPoints > 1) {
+
+      return "iPadOS (estimated)";
+
+    }
+
+    if (/Windows/i.test(ua)) return "Windows";
+
+    if (/Macintosh/i.test(ua)) return "macOS";
+
+    if (/Linux/i.test(ua)) return "Linux";
+
+    return "Unknown";
+
+  }
+
+  function detectBrowser() {
+
+    if (/Edg\/|EdgA|EdgiOS/i.test(ua)) return "Edge";
+
+    if (/OPR\/|OPT\//i.test(ua)) return "Opera";
+
+    if (/SamsungBrowser/i.test(ua)) return "Samsung Internet";
+
+    if (/FxiOS|Firefox/i.test(ua)) return "Firefox";
+
+    if (/CriOS|Chrome/i.test(ua)) return "Chrome";
+
+    if (/Safari/i.test(ua)) return "Safari";
+
+    return "Unknown";
+
+  }
+
+  function detectType() {
+
+    if (/iPad|Tablet/i.test(ua) ||
+
+        (/Macintosh/i.test(ua) &&
+
+         navigator.maxTouchPoints > 1)) {
+
+      return "Tablet";
+
+    }
+
+    if (/iPhone|iPod|Mobi/i.test(ua)) {
+
+      return "Smartphone";
+
+    }
+
+    if (/Android/i.test(ua)) {
+
+      return "Tablet / Android device";
+
+    }
+
+    return "Desktop / Laptop (estimated)";
+
+  }
+  function detectMaker() {
+
+    if (/iPhone|iPad|iPod|Macintosh/i.test(ua)) {
+
+      return "Apple (estimated)";
+
+    }
+
+    if (/Samsung|SM-[A-Z0-9]+/i.test(ua)) {
+
+      return "Samsung (estimated)";
+
+    }
+
+    if (/Pixel/i.test(ua)) return "Google (estimated)";
+
+    if (/HUAWEI|HONOR/i.test(ua)) {
+
+      return "Huawei / Honor (estimated)";
+
+    }
+
+    if (/Xiaomi|Redmi|POCO/i.test(ua)) {
+
+      return "Xiaomi (estimated)";
+
+    }
+
+    if (/OnePlus/i.test(ua)) {
+
+      return "OnePlus (estimated)";
+
+    }
+
+    return "Not exposed";
+
+  }
+
+  function basicInfo() {
+
+    show("os", detectOS());
+
+    show("browser", detectBrowser());
+
+    show("deviceType", detectType());
+
+    show("manufacturer", detectMaker());
+
+    const timezone =
+
+      Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    show("timezone", timezone || "Unavailable");
+
+    show("screen",
+
+      `${screen.width} × ${screen.height}`);
+
+    show("language",
+
+      navigator.language || "Unavailable");
+
+    show("cpu",
+
+      navigator.hardwareConcurrency
+
+        ? `${navigator.hardwareConcurrency} threads`
+
+        : "Not exposed");
+
+    show("memory",
+
+      navigator.deviceMemory
+
+        ? `${navigator.deviceMemory} GB (approximate)`
+
+        : "Not supported");
+
+    const touch =
+
+      navigator.maxTouchPoints > 0 ||
+
+      "ontouchstart" in window;
+
+    show("touch", touch ? "Supported" : "Not detected");
+
+    const dark = window.matchMedia(
+
+      "(prefers-color-scheme: dark)"
+
+    ).matches;
+
+    show("colorScheme", dark ? "Dark" : "Light");
+
+  }
+
+  function updateTime() {
+
+    show("localTime", new Date().toLocaleString());
+
+  }
+
+  function updateOnline() {
+
+    show("online",
+
+      navigator.onLine
+
+        ? "Browser reports online"
+
+        : "Browser reports offline");
+
+  }
+
+  function loadNetwork() {
+
+    const connection =
+
+      navigator.connection ||
+
+      navigator.mozConnection ||
+
+      navigator.webkitConnection;
+
+    if (!connection) {
+
+      show("network", "Not supported");
+
+      show("downlink", "Not supported");
+
+      return;
+
+    }
+
+    const updateConnectionDetails = () => {
+
+      show("network",
+
+        connection.effectiveType ||
+
+        connection.type ||
+
+        "Not exposed");
+
+      show("downlink",
+
+        Number.isFinite(connection.downlink)
+
+          ? `${connection.downlink} Mbps (estimated)`
+
+          : "Not exposed");
+
+    };
+
+    refresh();
+
+    connection.addEventListener?.("change", refresh);
+
+  }
+
+  function loadGPU() {
+
+    const canvas = document.createElement("canvas");
+
+    const gl = canvas.getContext("webgl");
+
+    if (!gl) {
+
+      show("gpu", "Not available");
+
+      return;
+
+    }
+
+    const ext = gl.getExtension(
+
+      "WEBGL_debug_renderer_info"
+
+    );
+
+    show("gpu",
+
+      ext
+
+        ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)
+
+        : "Renderer hidden");
+
+  }
+
+  async function loadBattery() {
+
+    if (!navigator.getBattery) {
+
+      show("battery", "Not supported");
+
+      return;
+
+    }
+
+    try {
+
+      const battery = await navigator.getBattery();
+
+      const refresh = () => {
+
+        show("battery",
+
+          `${Math.round(battery.level * 100)}%` +
+
+          (battery.charging ? " (Charging)" : ""));
+
+      };
+
+      refresh();
+
+      battery.addEventListener("levelchange", refresh);
+
+      battery.addEventListener("chargingchange", refresh);
+
+    } catch {
+
+      show("battery", "Unavailable");
+
+    }
+
+  }
+
+  async function fetchJson(url) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        cache: "no-store"
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  async function loadIP() {
+    try {
+      const result = await fetchJson("https://api.ipify.org?format=json");
+      show("ip", result.ip || "Unavailable");
+    } catch (error) {
+      console.warn("IP lookup unavailable", error);
+      show("ip", "Unavailable");
+    }
+  }
+
+  async function loadMap() {
+    const locationText = getEl("locationText");
+    const mapContainer = getEl("mapContainer");
+
+    try {
+      const result = await fetchJson("https://get.geojs.io/v1/ip/geo.json");
+      const latitude = Number(result.latitude);
+      const longitude = Number(result.longitude);
+
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude) ||
+          Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+        throw new Error("Invalid coordinates");
+      }
+
+      locationText.textContent =
+        [result.city, result.region, result.country].filter(Boolean).join(", ") ||
+        "Approximate location detected";
+
+      const map = document.createElement("iframe");
+      map.className = "map-frame";
+      map.title = "Approximate IP location";
+      map.loading = "lazy";
+      map.referrerPolicy = "no-referrer";
+      map.src = `https://maps.google.com/maps?q=${encodeURIComponent(`${latitude},${longitude}`)}&z=11&output=embed`;
+      mapContainer.replaceChildren(map);
+    } catch (error) {
+      console.warn("Location lookup unavailable", error);
+      locationText.textContent = "Approximate location unavailable";
+      mapContainer.textContent = "Map could not be loaded.";
+    }
+  }
+
+  function requestGPS() {
+
+    if (!navigator.geolocation) {
+
+      show("gps", "Not supported");
+
+      return;
+
+    }
+
+    if (!window.isSecureContext) {
+
+      show("gps", "Requires HTTPS or localhost");
+
+      return;
+
+    }
+
+    show("gps", "Waiting for browser permission...");
+
+    navigator.geolocation.getCurrentPosition(
+
+      position => {
+
+        const lat = position.coords.latitude.toFixed(5);
+
+        const lon = position.coords.longitude.toFixed(5);
+
+        show("gps", `Lat: ${lat}, Lon: ${lon}`);
+
+      },
+
+      error => {
+
+        show("gps",
+
+          error.code === 1
+
+            ? "Permission denied"
+
+            : error.code === 2
+
+            ? "Location unavailable"
+
+            : "Location request timed out");
+
+      },
+
+      {
+
+        enableHighAccuracy: false,
+
+        timeout: 15000
+
+      }
+
+    );
+
+  }
+
+  let started = false;
+
+  getEl("accept").addEventListener("click", () => {
+
+    if (started) return;
+
+    started = true;
+
+    getEl("overlay").classList.add("hidden");
+
+    getEl("status").textContent = "ANALYSIS ACTIVE";
+
+    requestGPS();
+
+    tryReading("Basic information", basicInfo);
+
+    tryReading("Network", loadNetwork);
+
+    tryReading("GPU", loadGPU);
+
+    tryReading("Time", updateTime);
+
+    tryReading("Online status", updateOnline);
+
+    for (const [id] of fields) {
+
+      if (getEl(id).textContent === "Waiting...") {
+
+        show(id, "Unavailable");
+
+      }
+
+    }
+
+    updateTime();
+
+    setInterval(updateTime, 1000);
+
+    loadBattery();
+
+    loadIP();
+
+    loadMap();
+
+  });
+
+  window.addEventListener("online", () => {
+
+    if (started) updateOnline();
+
+  });
+
+  window.addEventListener("offline", () => {
+
+    if (started) updateOnline();
+
+  });
+  console.log("QR Security System ready.");
+
+});
+
+</script>
+
+</body>
+
+</html>
